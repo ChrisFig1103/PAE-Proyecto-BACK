@@ -6,6 +6,7 @@ const cors=require('cors')
 const hbs = require('express-handlebars');
 const lessMiddleware = require('less-middleware');
 
+
 /********************************/
             //Routes
 /*******************************/
@@ -16,8 +17,8 @@ const index = require('./routes/index')
 //-Menu
 const menu = require('./routes/menu')
 const notification = require('./routes/notification')
-
-
+const correo=require('./routes/correo')
+const ordenar=require('./routes/ordenar')
 
 
 //Init app
@@ -42,8 +43,13 @@ app.use(express.static(path.join(__dirname, '/public')));
 app.use('/',index)
 app.use('/menu',menu)
 app.use('/notification',notification)
+app.use('/correo',correo)
+app.use('/ordenar',ordenar)
 
-
+app.use('/api/employees',require('./routes/employees.routes'));
+app.use('/api/cocineros',require('./routes/cocineros.routes'));
+app.use('/api/platillos',require('./routes/platillos.routes'));
+app.use('/api/mesas',require('./routes/mesas.routes'));
 
 // catch 404 and forward to error handler
  app.use(function(req, res, next) {

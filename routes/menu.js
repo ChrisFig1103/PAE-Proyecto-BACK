@@ -24,7 +24,6 @@ router.post("/pedido",(req,res)=>{
     let platillo=req.body.name
     let mesa=req.body.table
     let precio=req.body.price
-    //console.log("El body es:     "+req.body.price)
     let pedidoHecho={
         cantidad,
         platillo,
@@ -33,13 +32,13 @@ router.post("/pedido",(req,res)=>{
         tomado:0
     }
 
-    let table= mongoose.model('mesas',MesaSchema);
-    table.findOneAndUpdate({"id":mesa},{$push:{pedido:pedidoHecho}},{
+
+    MesaSchema.findOneAndUpdate({id:mesa},{$push:{pedido:pedidoHecho}},{
         new:true
     }).then(e=>{
+        console.log("Pedido agregado")
         res.send("Done")
     })
-    //console.log(pedidoHecho)
     
     
     
@@ -54,10 +53,9 @@ router.post("/pedido",(req,res)=>{
 
 router.get("/pedido/:id",(req,res)=>{
     let pedidos=[]
-    let table= mongoose.model('mesas',MesaSchema);
     let id=req.params.id
     //console.log("el ID es" +id)
-    table.findOne({id:id}).lean().then(e=>{
+    MesaSchema.findOne({id:id}).lean().then(e=>{
         //console.log(e.pedido)
         pedidos=e.pedido
         res.send(pedidos)
@@ -69,38 +67,38 @@ router.get("/pedido/:id",(req,res)=>{
 
 
 
-router.get("/validate/:id/:mesa",(req,res)=>{
+router.get("/validate/:id/:mesa",async(req,res)=>{
     let contra=req.params.id
     let mesa=req.params.mesa
     if(contra){
-        let table= mongoose.model('mesas',MesaSchema);
-        table.findOne({"id":mesa,"codigo":contra}).then(e=>{
-            if(e){
-                res.send("pasa")
+        
+        let resp= await MesaSchema.findOne({id:mesa,codigo:contra}).lean()
+            if(resp){
+                console.log(resp)
+                res.send("pasa").status(201)
             }else{
-                res.send("false")
+                res.send(null)
             }
-        })
+        
     }
     
 })
 
 router.get("/verify/:id/:mesa", (req, res) => {
-    let logged = false
+    
     let contra = req.params.id
     let mesa = req.params.mesa
     if (mesa && contra) {
-        let table = mongoose.model('mesas', MesaSchema);
-        table.findOne({ "id": mesa, "codigo": contra, "activo": 1 }).then(e => {
+        MesaSchema.findOne({ id: mesa,codigo: contra, activo: true }).then(e => {
             if (e) {
                 res.send("true")
             } else {
-                res.send("false")
+                res.send(null)
             }
 
         })
     }else{
-        res.send("false")
+        res.send(null)
     }
     
 
